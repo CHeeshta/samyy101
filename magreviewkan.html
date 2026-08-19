@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 SysAdmin Challenge Arena</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(145deg, #0b0e1a 0%, #1a1f30 100%);
+            min-height: 100vh;
+            color: #e0e6f0;
+            padding: 20px;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1f30; }
+        ::-webkit-scrollbar-thumb { background: #4a6cf7; border-radius: 10px; }
+
+        .game-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(20, 25, 45, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            padding: 30px 25px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid rgba(74, 108, 247, 0.2);
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(74, 108, 247, 0.3);
+            padding-bottom: 18px;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .title-section h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f7b731, #f5a623, #4a6cf7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .title-section .fa-gamepad {
+            font-size: 2.8rem;
+            color: #f7b731;
+            filter: drop-shadow(0 0 12px #f7b73166);
+        }
+
+        .stats {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: rgba(74, 108, 247, 0.15);
+            border: 1px solid rgba(74, 108, 247, 0.3);
+            border-radius: 50px;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .stat-box i { color: #f7b731; font-size: 1.4rem; }
+        .stat-box span { color: #fff; min-width: 30px; text-align: center; }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #4a6cf7, #6a4cf7);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 18px rgba(74, 108, 247, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-reset:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 28px rgba(74, 108, 247, 0.6);
+        }
+
+        .filter-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 28px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #aab4d0;
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn i { margin-right: 8px; }
+
+        .filter-btn.active {
+            background: rgba(74, 108, 247, 0.25);
+            border-color: #4a6cf7;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(74, 108, 247, 0.15);
+        }
+
+        .filter-btn:hover {
+            background: rgba(74, 108, 247, 0.15);
+            color: #fff;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .q-card {
+            background: rgba(14, 18, 36, 0.8);
+            border-radius: 24px;
+            padding: 20px 22px 22px;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: 0.3s;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .q-card:hover {
+            border-color: rgba(74, 108, 247, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #7a86a8;
+        }
+
+        .q-badge {
+            background: rgba(74, 108, 247, 0.2);
+            padding: 4px 14px;
+            border-radius: 50px;
+            border: 1px solid rgba(74, 108, 247, 0.15);
+        }
+
+        .q-badge i { margin-right: 6px; }
+
+        .q-text {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            color: #f0f4ff;
+            min-height: 52px;
+        }
+
+        .q-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex: 1;
+        }
+
+        .q-options label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.02);
+            padding: 8px 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.03);
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            color: #c8d0e6;
+        }
+
+        .q-options label:hover {
+            background: rgba(74, 108, 247, 0.08);
+            border-color: rgba(74, 108, 247, 0.15);
+        }
+
+        .q-options input[type="radio"] {
+            accent-color: #4a6cf7;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .q-options label.correct {
+            background: rgba(46, 213, 115, 0.15);
+            border-color: #2ed573;
+        }
+
+        .q-options label.wrong {
+            background: rgba(255, 71, 87, 0.15);
+            border-color: #ff4757;
+        }
+
+        .letter {
+            font-weight: 700;
+            color: #4a6cf7;
+            min-width: 20px;
+        }
+
+        .q-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding-top: 12px;
+        }
+
+        .q-status {
+            font-size: 0.8rem;
+            color: #7a86a8;
+        }
+
+        .q-status i { margin-right: 6px; }
+
+        .scoreboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px 40px;
+            margin: 30px 0 15px;
+            padding: 18px 28px;
+            background: rgba(74, 108, 247, 0.06);
+            border-radius: 60px;
+            border: 1px solid rgba(74, 108, 247, 0.1);
+        }
+
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .score-item i { font-size: 1.5rem; }
+        .score-item .num { color: #fff; font-size: 1.4rem; min-width: 36px; }
+
+        .color-correct { color: #2ed573; }
+        .color-wrong { color: #ff4757; }
+        .color-total { color: #f7b731; }
+
+        @media (max-width: 700px) {
+            .header { flex-direction: column; align-items: stretch; gap: 16px; }
+            .title-section h1 { font-size: 2rem; }
+            .stats { justify-content: center; }
+            .stat-box { padding: 6px 16px; font-size: 0.9rem; }
+            .questions-grid { grid-template-columns: 1fr; }
+            .scoreboard { border-radius: 30px; padding: 14px 18px; }
+        }
+
+        @media (max-width: 480px) {
+            .game-container { padding: 16px 12px; }
+            .q-card { padding: 16px; }
+            .q-text { font-size: 0.95rem; }
+        }
+
+        @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .q-card { animation: fadeSlide 0.4s ease forwards; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="game-container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="title-section">
+                <i class="fas fa-gamepad"></i>
+                <h1>SysAdmin Arena</h1>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <i class="fas fa-check-circle" style="color:#2ed573;"></i>
+                    <span>{{ correctCount }}</span>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-times-circle" style="color:#ff4757;"></i>
+                    <span>{{ wrongCount }}</span>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-question-circle" style="color:#f7b731;"></i>
+                    <span>{{ totalAnswered }}</span>
+                    <span style="color:#7a86a8;">/ 120</span>
+                </div>
+                <button class="btn-reset" @click="resetAll">
+                    <i class="fas fa-redo-alt"></i> New Game
+                </button>
+            </div>
+        </div>
+
+        <!-- FILTER TABS -->
+        <div class="filter-tabs">
+            <button class="filter-btn" :class="{ active: filter === 'all' }" @click="filter = 'all'">
+                <i class="fas fa-layer-group"></i> All (120)
+            </button>
+            <button class="filter-btn" :class="{ active: filter === 'beginner' }" @click="filter = 'beginner'">
+                <i class="fas fa-star"></i> Beginner
+            </button>
+            <button class="filter-btn" :class="{ active: filter === 'functions' }" @click="filter = 'functions'">
+                <i class="fas fa-tasks"></i> Functions
+            </button>
+            <button class="filter-btn" :class="{ active: filter === 'accounts' }" @click="filter = 'accounts'">
+                <i class="fas fa-users"></i> Accounts
+            </button>
+            <button class="filter-btn" :class="{ active: filter === 'filesystem' }" @click="filter = 'filesystem'">
+                <i class="fas fa-folder-tree"></i> File Systems
+            </button>
+            <button class="filter-btn" :class="{ active: filter === 'truefalse' }" @click="filter = 'truefalse'">
+                <i class="fas fa-check-double"></i> True/False
+            </button>
+            <button class="filter-btn" :class="{ active: filter === 'fillblank' }" @click="filter = 'fillblank'">
+                <i class="fas fa-pen"></i> Fill Blanks
+            </button>
+            <button class="filter-btn" :class="{ active: filter === 'matching' }" @click="filter = 'matching'">
+                <i class="fas fa-link"></i> Matching
+            </button>
+            <button class="filter-btn" :class="{ active: filter === 'scenario' }" @click="filter = 'scenario'">
+                <i class="fas fa-chess-king"></i> Scenario
+            </button>
+        </div>
+
+        <!-- SCOREBOARD -->
+        <div class="scoreboard">
+            <div class="score-item"><i class="fas fa-check-circle color-correct"></i> Correct: <span class="num color-correct">{{ correctCount }}</span></div>
+            <div class="score-item"><i class="fas fa-times-circle color-wrong"></i> Wrong: <span class="num color-wrong">{{ wrongCount }}</span></div>
+            <div class="score-item"><i class="fas fa-percent color-total"></i> Score: <span class="num color-total">{{ scorePercent }}%</span></div>
+        </div>
+
+        <!-- QUESTIONS GRID -->
+        <div class="questions-grid">
+            <div v-for="q in filteredQuestions" :key="q.id" class="q-card">
+                <div class="q-header">
+                    <span class="q-badge">
+                        <i class="fas fa-tag"></i> {{ q.round }}
+                    </span>
+                    <span style="color:#4a6cf7;">#{{ q.id }}</span>
+                </div>
+
+                <div class="q-text">{{ q.text }}</div>
+
+                <div class="q-options">
+                    <label v-for="(opt, idx) in q.options" :key="idx"
+                           :class="{
+                               correct: isAnswered(q.id) && isCorrect(q.id, idx),
+                               wrong: isAnswered(q.id) && isWrong(q.id, idx)
+                           }">
+                        <input type="radio" 
+                               :name="'q' + q.id" 
+                               :value="idx"
+                               @change="selectOption(q.id, idx)"
+                               :disabled="isAnswered(q.id)">
+                        <span class="letter">{{ String.fromCharCode(65 + idx) }}.</span>
+                        <span v-html="opt"></span>
+                    </label>
+                </div>
+
+                <div class="q-footer">
+                    <span class="q-status" :style="{ color: getStatusColor(q.id) }">
+                        <i :class="'fas ' + getStatusIcon(q.id)"></i>
+                        {{ isAnswered(q.id) ? (isCorrect(q.id, answered[q.id]) ? 'Correct!' : 'Wrong!') : 'Not answered' }}
+                    </span>
+                    <span v-if="isAnswered(q.id)" style="font-size:0.8rem;color:#7a86a8;">
+                        <i class="fas fa-check-circle" style="color:#2ed573;"></i> Answer: {{ String.fromCharCode(65 + q.correct) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:30px; color:#5a6688; font-size:0.9rem; border-top:1px solid rgba(255,255,255,0.03); padding-top:20px;">
+            <i class="fas fa-code"></i> SysAdmin Challenge · 120 random questions · Good luck! 🍀
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+const { createApp, ref, computed, onMounted } = Vue;
+
+// ============================================================
+//  ALL 120 QUESTIONS
+// ============================================================
+const allQuestions = [
+    // BEGINNER (1-20)
+    { id:1, round:'beginner', text:'What is System Administration?', options:['The field responsible for maintaining reliable computer systems in a multi-user environment','The field focused only on hardware maintenance','The field that creates computer games','The field that designs websites'], correct:0 },
+    { id:2, round:'beginner', text:'A System Administrator is also known as:', options:['Software Developer','SysAd or Sysadmin','Hardware Engineer','Network Designer'], correct:1 },
+    { id:3, round:'beginner', text:'What does a System Administrator seek to ensure?', options:['Maximum profit for the company','Uptime, performance, resources, and security of computers','Employee happiness','Office cleanliness'], correct:1 },
+    { id:4, round:'beginner', text:'What is the role of a System Administrator?', options:['Only repairing printers','Managing, overseeing, and maintaining a multiuser computing environment','Designing websites','Creating video games'], correct:1 },
+    { id:5, round:'beginner', text:'What is KVM in KVM switch?', options:['Kernel Virtual Machine','Keyboard, Video, and Mouse','Keep Various Machines','Knowledge Virtual Manager'], correct:1 },
+    { id:6, round:'beginner', text:'What type of server stores and serves content to clients on the internet?', options:['Email server','Web server','File server','Database server'], correct:1 },
+    { id:7, round:'beginner', text:'Which server provides email services to other machines?', options:['Web server','Email server','SSH server','FTP server'], correct:1 },
+    { id:8, round:'beginner', text:'What is the most common form of server hardware mounted in racks?', options:['Tower servers','Rack servers','Blade servers','Desktop servers'], correct:1 },
+    { id:9, round:'beginner', text:'What type of server is described as "slimmer" than others?', options:['Tower servers','Rack servers','Blade servers','Mini servers'], correct:2 },
+    { id:10, round:'beginner', text:'What is cloud computing?', options:['Computing using weather data','Accessing data, applications, and files anywhere with internet connection','Computing in a physical server room','Offline computing'], correct:1 },
+    { id:11, round:'beginner', text:'What is a Data Center?', options:['A room with one server','A facility that stores hundreds or thousands of servers','A software program','A type of cloud service'], correct:1 },
+    { id:12, round:'beginner', text:'What is bandwidth?', options:['How much data can be transmitted in a second','The delay before data is received','The speed of the processor','The size of the hard drive'], correct:0 },
+    { id:13, round:'beginner', text:'What is latency?', options:['How much data can be transmitted','The delay before data is received by the other end','The speed of internet connection','The processing speed of CPU'], correct:1 },
+    { id:14, round:'beginner', text:'What is a workstation in system administration context?', options:['A powerful server','Computer hardware dedicated to a single customer\'s work','A network device','A software application'], correct:1 },
+    { id:15, round:'beginner', text:'Which of the following is NOT a form of server hardware?', options:['Tower server','Rack server','Floor server','Blade server'], correct:2 },
+    { id:16, round:'beginner', text:'What is a client in computing?', options:['A machine that requires services from servers','A machine that provides services','A network switch','A storage device'], correct:0 },
+    { id:17, round:'beginner', text:'What is a service?', options:['The hardware of a server','The function that a server provides','The physical location of servers','The power supply of servers'], correct:1 },
+    { id:18, round:'beginner', text:'What does "24x7" mean for servers?', options:['Servers run only on weekends','Servers run 24 hours a day, 7 days a week','Servers run for 24 minutes every 7 hours','Servers run only during business hours'], correct:1 },
+    { id:19, round:'beginner', text:'What is the main purpose of a Syslog Server?', options:['To store emails','To keep records of system and application logs','To host websites','To manage user accounts'], correct:1 },
+    { id:20, round:'beginner', text:'What is automation in system administration?', options:['Using robots to fix computers','Writing scripts to do tasks automatically at specific times','Automatically turning off servers','Auto-updating antivirus only'], correct:1 },
+
+    // FUNCTIONS (21-40)
+    { id:21, round:'functions', text:'Which of the following is a system administrator responsibility?', options:['Installing, maintaining, and troubleshooting workstations','Designing company logos','Writing employee performance reviews','Creating marketing campaigns'], correct:0 },
+    { id:22, round:'functions', text:'What does a system administrator do with user accounts?', options:['Delete them immediately','Create user accounts and assign user permissions','Share them with others','Sell them to other companies'], correct:1 },
+    { id:23, round:'functions', text:'What is the purpose of documentation?', options:['To keep records of assets including hardware and software','To write novels','To create user manuals only','To track employee attendance'], correct:0 },
+    { id:24, round:'functions', text:'What should a hardware inventory include?', options:['Only the brand of computers','OS, RAM, CPU, HDD, and open ports details','Employee names only','Office furniture inventory'], correct:1 },
+    { id:25, round:'functions', text:'What is a critical function of a SysAdmin related to hardware?', options:['Hardware inventory','Hardware decoration','Hardware painting','Hardware moving'], correct:0 },
+    { id:26, round:'functions', text:'What should you do when checking running processes?', options:['Ignore resource consumption','Check for processes consuming more resources and fine-tune applications','Delete all processes','Restart the server immediately'], correct:1 },
+    { id:27, round:'functions', text:'What is CPU utilization monitoring?', options:['Checking how much CPU is being used by critical processes','Measuring CPU temperature','Counting CPU cores','Testing CPU speed'], correct:0 },
+    { id:28, round:'functions', text:'What is a zombie process?', options:['A scary process','A process where the PID still exists after termination','A process that eats resources','A process that cannot start'], correct:1 },
+    { id:29, round:'functions', text:'Why are zombie processes bad?', options:['They make the server look scary','They degrade server performance','They delete files','They crash the internet'], correct:1 },
+    { id:30, round:'functions', text:'What is patching in system administration?', options:['Fixing holes in servers','Implementing OS patches for known vulnerabilities','Covering servers with patches','Painting servers'], correct:1 },
+    { id:31, round:'functions', text:'What are the types of patches mentioned?', options:['Security, Critical, Moderate','Small, Medium, Large','Red, Blue, Green','Daily, Weekly, Monthly'], correct:0 },
+    { id:32, round:'functions', text:'What is server hardening?', options:['Making servers physically stronger','Securing servers through various security measures','Adding more RAM','Increasing processor speed'], correct:1 },
+    { id:33, round:'functions', text:'What should you set on a server for BIOS?', options:['A user account','A BIOS password to prevent altering BIOS settings','A welcome message','A screensaver'], correct:1 },
+    { id:34, round:'functions', text:'What is the purpose of denying root access in Linux?', options:['To make users angry','To minimize the probability of intrusions','To slow down the system','To prevent users from working'], correct:1 },
+    { id:35, round:'functions', text:'What are Sudo users?', options:['Users with no permissions','Users with limited privileges to invoke commands','Users with full access','Users who cannot access the system'], correct:1 },
+    { id:36, round:'functions', text:'What are TCP wrappers used for?', options:['To wrap servers in plastic','To protect servers from hackers by allowing only trusted hosts','To decorate servers','To store files'], correct:1 },
+    { id:37, round:'functions', text:'What should you do with logs regularly?', options:['Delete them immediately','Check them regularly and rotate them','Ignore them','Print them all'], correct:1 },
+    { id:38, round:'functions', text:'How long should logs be kept according to the module?', options:['Forever','For 7 days','For 30 days','For 1 year'], correct:1 },
+    { id:39, round:'functions', text:'What is a Syslog Server?', options:['A server that sends emails','A server that keeps records of system and application logs','A server that hosts websites','A server that manages users'], correct:1 },
+    { id:40, round:'functions', text:'Why is automation important?', options:['It makes the system slower','It allows tasks to be done automatically at specific times','It makes employees lazy','It costs more money'], correct:1 },
+
+    // ACCOUNTS (41-60)
+    { id:41, round:'accounts', text:'What is the Administrator account type in Windows?', options:['An account with no permissions','An account with unrestricted access for administrative tasks','An account that can only read files','An account that cannot install software'], correct:1 },
+    { id:42, round:'accounts', text:'What is the Standard User account type in Windows?', options:['An account with full control','An account that performs day-to-day tasks with limited permissions','An account that cannot run applications','An account that is always locked'], correct:1 },
+    { id:43, round:'accounts', text:'Which built-in account in Windows has full control?', options:['Guest','Administrator','HomeGroupUser$','Default Account'], correct:1 },
+    { id:44, round:'accounts', text:'Which built-in account in Windows is disabled by default?', options:['Administrator','Guest','Both Administrator and Guest','Initial User'], correct:2 },
+    { id:45, round:'accounts', text:'What is a domain user account?', options:['An account stored locally on a computer','An account stored in Active Directory\'s central database','An account without a password','An account that cannot access the network'], correct:1 },
+    { id:46, round:'accounts', text:'What is a workgroup?', options:['A group of people working together','A network configuration implying local logon','A type of software','A hardware device'], correct:1 },
+    { id:47, round:'accounts', text:'What does UAC stand for in Windows?', options:['User Access Control','User Account Control','Universal Account Configuration','Unique Access Code'], correct:1 },
+    { id:48, round:'accounts', text:'How do you access Local Users and Groups utility?', options:['Through Control Panel only','Through Computer Management utility or as MMC snap-in','Through Task Manager','Through File Explorer'], correct:1 },
+    { id:49, round:'accounts', text:'In Linux, what is a UID?', options:['User Identification Number','Universal Identifier','Unique Identity','User Interface Design'], correct:0 },
+    { id:50, round:'accounts', text:'In Linux, what is a GID?', options:['Global Identifier','Group Identification Number','General Input Device','Graphical Interface Display'], correct:1 },
+    { id:51, round:'accounts', text:'What is the file /etc/passwd in Linux?', options:['A file containing passwords only','The system\'s master list of information about users','A file containing group information','A file containing system logs'], correct:1 },
+    { id:52, round:'accounts', text:'What fields are in /etc/passwd entry?', options:['Username:password:UID:GID:user info:home directory:login shell','Name:age:address:phone','User:pass:email:phone','ID:name:department:title'], correct:0 },
+    { id:53, round:'accounts', text:'What are pseudo users?', options:['Fake users','User accounts that exist only to execute processes for subsystems','Users without passwords','Administrators'], correct:1 },
+    { id:54, round:'accounts', text:'What is the command to change a user\'s password in Linux?', options:['chpasswd','passwd','changepw','newpass'], correct:1 },
+    { id:55, round:'accounts', text:'How do you lock a user account in Linux?', options:['Delete the account','Use passwd -l option','Use lock command','Remove the user\'s home directory'], correct:1 },
+    { id:56, round:'accounts', text:'What command is used to add a new user in Linux?', options:['useradd','adduser','newuser','createuser'], correct:0 },
+    { id:57, round:'accounts', text:'What command is used to modify existing user settings in Linux?', options:['useradd','usermod','userdel','userchange'], correct:1 },
+    { id:58, round:'accounts', text:'What command is used to delete a user account in Linux?', options:['useradd','usermod','userdel','userremove'], correct:2 },
+    { id:59, round:'accounts', text:'What should you do when an employee leaves the organization?', options:['Delete the account immediately without checking','Disable the account as soon as notified','Keep the account active indefinitely','Share the account with others'], correct:1 },
+    { id:60, round:'accounts', text:'What is LDAP?', options:['Lightweight Directory Access Protocol','Large Data Access Protocol','Local Directory Application Protocol','Linux Directory Access Program'], correct:0 },
+
+    // FILESYSTEM (61-80)
+    { id:61, round:'filesystem', text:'What is a File System?', options:['A physical filing cabinet','A set of logical constructs to track and manage files on a disk','A type of database','A network protocol'], correct:1 },
+    { id:62, round:'filesystem', text:'Who created FAT?', options:['Steve Jobs and Steve Wozniak','Bill Gates and Marc McDonald','Linus Torvalds','Mark Zuckerberg'], correct:1 },
+    { id:63, round:'filesystem', text:'In what year was FAT created?', options:['1987','1977','1997','1967'], correct:1 },
+    { id:64, round:'filesystem', text:'What does the "32" in FAT32 represent?', options:['The number of files allowed','The number of bits needed to keep track of files','The maximum file size in GB','The year it was created'], correct:1 },
+    { id:65, round:'filesystem', text:'What does NTFS stand for?', options:['Network File Transfer System','New Technology File System','National File Tracking System','Non-Traditional File System'], correct:1 },
+    { id:66, round:'filesystem', text:'Where did NTFS originate from?', options:['FAT file system','HPFS file system','EXT file system','HFS file system'], correct:1 },
+    { id:67, round:'filesystem', text:'Which file system is more complex?', options:['FAT32','NTFS','Both are equally complex','Neither is complex'], correct:1 },
+    { id:68, round:'filesystem', text:'What does FAT32 use for space allocation?', options:['Large clusters','Small clusters','No clusters','Variable clusters'], correct:1 },
+    { id:69, round:'filesystem', text:'What is the largest possible file size in FAT32?', options:['2GB','4GB minus 2 bytes','16TB','256TB'], correct:1 },
+    { id:70, round:'filesystem', text:'What is the maximum partition size for NTFS with 4KB clusters?', options:['2TB','16TB','256TB','512TB'], correct:1 },
+    { id:71, round:'filesystem', text:'Which file system offers file-level encryption?', options:['FAT32','NTFS','Both','Neither'], correct:1 },
+    { id:72, round:'filesystem', text:'Which file system is recommended for Windows 10?', options:['FAT32','NTFS','FAT16','EXT4'], correct:1 },
+    { id:73, round:'filesystem', text:'When should you choose FAT32 over NTFS?', options:['For better security','For dual-booting with older systems','For faster performance always','For large files'], correct:1 },
+    { id:74, round:'filesystem', text:'Which file system is universally supported for portable devices?', options:['NTFS','FAT32','EXT4','HPFS'], correct:1 },
+    { id:75, round:'filesystem', text:'What is the command to convert a drive to NTFS?', options:['Format D:/fs:ntfs','Convert D:/fs:ntfs','Change D:/fs:ntfs','Transform D:/fs:ntfs'], correct:1 },
+    { id:76, round:'filesystem', text:'What is mounting?', options:['A process that disconnects a filesystem','A process that makes a filesystem\'s contents available','A process that deletes a filesystem','A process that formats a filesystem'], correct:1 },
+    { id:77, round:'filesystem', text:'What command mounts a filesystem in Linux?', options:['mount','unmount','mountfs','mountpoint'], correct:0 },
+    { id:78, round:'filesystem', text:'What command dismounts a filesystem in Linux?', options:['mount','unmount','umount','dismount'], correct:2 },
+    { id:79, round:'filesystem', text:'Which filesystem can never be dismounted while the system is up?', options:['/home','Root filesystem','/tmp','/var'], correct:1 },
+    { id:80, round:'filesystem', text:'What is the -r option in the mount command used for?', options:['To mount a filesystem with read-write access','To mount a filesystem read-only','To mount a filesystem remotely','To mount a filesystem quickly'], correct:1 },
+
+    // TRUE/FALSE (81-90)
+    { id:81, round:'truefalse', text:'The Administrator account in Windows is enabled by default.', options:['True','False'], correct:1 },
+    { id:82, round:'truefalse', text:'Zombie processes can degrade server performance.', options:['True','False'], correct:0 },
+    { id:83, round:'truefalse', text:'FAT32 provides better security features than NTFS.', options:['True','False'], correct:1 },
+    { id:84, round:'truefalse', text:'System administrators should write scripts to automate routine tasks.', options:['True','False'], correct:0 },
+    { id:85, round:'truefalse', text:'Mounting a filesystem means disconnecting it from the system.', options:['True','False'], correct:1 },
+    { id:86, round:'truefalse', text:'The Guest account in Windows is enabled by default.', options:['True','False'], correct:1 },
+    { id:87, round:'truefalse', text:'NTFS offers file compression capabilities.', options:['True','False'], correct:0 },
+    { id:88, round:'truefalse', text:'A Standard User account can install most software in Windows.', options:['True','False'], correct:1 },
+    { id:89, round:'truefalse', text:'Linux uses the .exe extension for executable files.', options:['True','False'], correct:1 },
+    { id:90, round:'truefalse', text:'Active Directory is available in both cloud-based and server-based versions.', options:['True','False'], correct:0 },
+
+    // FILL BLANKS (91-100)
+    { id:91, round:'fillblank', text:'The file _____ is the system\'s master list of information about users in Linux.', options:['/etc/passwd','/etc/shadow','/etc/group','/etc/gshadow'], correct:0 },
+    { id:92, round:'fillblank', text:'In Windows, UAC stands for _____ _____ _____.', options:['User Account Control','User Access Control','Universal Account Code','Unique Access Credential'], correct:0 },
+    { id:93, round:'fillblank', text:'_____ is the process that makes a filesystem\'s contents available to the system.', options:['Mounting','Formatting','Partitioning','Linking'], correct:0 },
+    { id:94, round:'fillblank', text:'The two basic types of user accounts in Windows are _____ and _____.', options:['Administrator and Standard User','Admin and Guest','Power and Limited','Domain and Local'], correct:0 },
+    { id:95, round:'fillblank', text:'The term _____ refers to how much data can be transmitted in a second.', options:['Bandwidth','Latency','Throughput','Speed'], correct:0 },
+    { id:96, round:'fillblank', text:'_____ is the delay before data is received by the other end.', options:['Latency','Bandwidth','Jitter','Ping'], correct:0 },
+    { id:97, round:'fillblank', text:'The _____ account type provides unrestricted access for performing administrative tasks.', options:['Administrator','Standard','Guest','System'], correct:0 },
+    { id:98, round:'fillblank', text:'In Linux, the _____ command may be used to assign an initial password for a user account.', options:['passwd','password','chpasswd','setpass'], correct:0 },
+    { id:99, round:'fillblank', text:'_____ means connecting a filesystem to the overall directory tree.', options:['Mounting','Linking','Binding','Mapping'], correct:0 },
+    { id:100, round:'fillblank', text:'The _____ file contains encoded passwords and password settings in Linux.', options:['/etc/shadow','/etc/passwd','/etc/group','/etc/gshadow'], correct:0 },
+
+    // MATCHING (101-110)
+    { id:101, round:'matching', text:'Match: SysAdmin', options:['System Administrator','Lightweight Directory Access Protocol','New Technology File System','Keyboard, Video, and Mouse'], correct:0 },
+    { id:102, round:'matching', text:'Match: KVM', options:['Keyboard, Video, and Mouse','System Administrator','File Allocation Table 32','User Account Control'], correct:0 },
+    { id:103, round:'matching', text:'Match: NTFS', options:['New Technology File System','File Allocation Table 32','Lightweight Directory Access Protocol','User Identification Number'], correct:0 },
+    { id:104, round:'matching', text:'Match: FAT32', options:['File Allocation Table 32','New Technology File System','System Administrator','Group Identification Number'], correct:0 },
+    { id:105, round:'matching', text:'Match: LDAP', options:['Lightweight Directory Access Protocol','User Account Control','Keyboard, Video, and Mouse','System Administrator'], correct:0 },
+    { id:106, round:'matching', text:'Match: UAC', options:['User Account Control','User Identification Number','Group Identification Number','System Administrator'], correct:0 },
+    { id:107, round:'matching', text:'Match: UID', options:['User Identification Number','Group Identification Number','System Administrator','User Account Control'], correct:0 },
+    { id:108, round:'matching', text:'Match: GID', options:['Group Identification Number','User Identification Number','System Administrator','File Allocation Table 32'], correct:0 },
+    { id:109, round:'matching', text:'Match: /etc/passwd', options:['User account information in Linux','Encoded passwords in Linux','Group definitions in Linux','System logs in Linux'], correct:0 },
+    { id:110, round:'matching', text:'Match: /etc/shadow', options:['Encoded passwords in Linux','User account information in Linux','Group definitions in Linux','System logs in Linux'], correct:0 },
+
+    // SCENARIO (111-120)
+    { id:111, round:'scenario', text:'A user reports they can\'t install a new software. What type of account are they likely using?', options:['Administrator account','Standard User account','Guest account','Domain account'], correct:1 },
+    { id:112, round:'scenario', text:'You notice a server is running very slowly. What should you check first?', options:['CPU utilization, memory utilization, and load average','The server\'s color','The age of the server','The brand of the server'], correct:0 },
+    { id:113, round:'scenario', text:'A user needs to access a sensitive folder, but another user should not. Which file system must you be using?', options:['FAT32','NTFS','FAT16','All of the above'], correct:1 },
+    { id:114, round:'scenario', text:'You need to use a USB drive on an older computer. Which file system should you use?', options:['NTFS','FAT32','EXT4','HFS'], correct:1 },
+    { id:115, round:'scenario', text:'An employee is leaving on bad terms. What should you do immediately?', options:['Delete their account','Disable their account','Change their password','Do nothing'], correct:1 },
+    { id:116, round:'scenario', text:'You\'re getting alerts about high CPU usage on a critical server. What should you do?', options:['Ignore the alerts','Check which processes are consuming CPU and coordinate with application team','Restart the server immediately','Buy a new server'], correct:1 },
+    { id:117, round:'scenario', text:'You need to upgrade the OS on multiple workstations. Which SysAdmin function should you use?', options:['Automation','Documentation','Patching','Monitoring'], correct:0 },
+    { id:118, round:'scenario', text:'A security vulnerability was found in the current OS version. What should you do?', options:['Wait for the next update','Apply security patches promptly','Ignore it','Change all passwords'], correct:1 },
+    { id:119, round:'scenario', text:'You want to track all system events for troubleshooting. What should you configure?', options:['A Syslog Server','A web server','An email server','A file server'], correct:0 },
+    { id:120, round:'scenario', text:'You need to allow only trusted hosts to access your server via SSH. What should you use?', options:['Firewall only','TCP wrappers','Antivirus','Encryption'], correct:1 }
+];
+
+// ============================================================
+//  VUE APP
+// ============================================================
+createApp({
+    setup() {
+        const filter = ref('all');
+        const questions = ref([]);
+        const answered = ref({});
+
+        // Shuffle function
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Load shuffled questions
+        function loadQuestions() {
+            questions.value = shuffleArray([...allQuestions]);
+            answered.value = {};
+        }
+
+        // Computed
+        const filteredQuestions = computed(() => {
+            if (filter.value === 'all') return questions.value;
+            return questions.value.filter(q => q.round === filter.value);
+        });
+
+        const correctCount = computed(() => {
+            let count = 0;
+            for (const q of questions.value) {
+                if (answered.value[q.id] !== undefined && answered.value[q.id] === q.correct) count++;
+            }
+            return count;
+        });
+
+        const wrongCount = computed(() => {
+            let count = 0;
+            for (const q of questions.value) {
+                if (answered.value[q.id] !== undefined && answered.value[q.id] !== q.correct) count++;
+            }
+            return count;
+        });
+
+        const totalAnswered = computed(() => {
+            return Object.keys(answered.value).length;
+        });
+
+        const scorePercent = computed(() => {
+            if (totalAnswered.value === 0) return 0;
+            return Math.round((correctCount.value / totalAnswered.value) * 100);
+        });
+
+        // Methods
+        function selectOption(questionId, optionIndex) {
+            if (answered.value[questionId] !== undefined) return;
+            answered.value[questionId] = optionIndex;
+        }
+
+        function isAnswered(qId) {
+            return answered.value[qId] !== undefined;
+        }
+
+        function isCorrect(qId, optIdx) {
+            const q = questions.value.find(q => q.id === qId);
+            if (!q) return false;
+            return answered.value[qId] === q.correct && optIdx === q.correct;
+        }
+
+        function isWrong(qId, optIdx) {
+            const q = questions.value.find(q => q.id === qId);
+            if (!q) return false;
+            return answered.value[qId] === optIdx && optIdx !== q.correct;
+        }
+
+        function getStatusIcon(qId) {
+            if (!isAnswered(qId)) return 'fa-circle';
+            const q = questions.value.find(q => q.id === qId);
+            if (!q) return 'fa-circle';
+            return answered.value[qId] === q.correct ? 'fa-check-circle' : 'fa-times-circle';
+        }
+
+        function getStatusColor(qId) {
+            if (!isAnswered(qId)) return '#7a86a8';
+            const q = questions.value.find(q => q.id === qId);
+            if (!q) return '#7a86a8';
+            return answered.value[qId] === q.correct ? '#2ed573' : '#ff4757';
+        }
+
+        function resetAll() {
+            loadQuestions();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Lifecycle
+        onMounted(() => {
+            loadQuestions();
+        });
+
+        return {
+            filter,
+            questions,
+            answered,
+            filteredQuestions,
+            correctCount,
+            wrongCount,
+            totalAnswered,
+            scorePercent,
+            selectOption,
+            isAnswered,
+            isCorrect,
+            isWrong,
+            getStatusIcon,
+            getStatusColor,
+            resetAll
+        };
+    }
+}).mount('#app');
+</script>
+
+</body>
+</html>
